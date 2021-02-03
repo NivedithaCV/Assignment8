@@ -1,10 +1,30 @@
 
+# importing modules
 import math as m
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import random
 import matplotlib.animation as anim
+
 #read  and write
+def read_sqmatrix(A,z,name):
+    with open(A,z) as fhand:
+        M=[]
+        N=[]
+        for line in fhand:
+          line=line.rstrip()
+          li=list(line.split(","))
+          c=len(li)
+          M.append(li)
+        r=len(M)
+        col=len(M[0])
+        A=[[0 for y in range(c)]for x in range(r)]
+
+        for i in range(r):
+          for j in range(c):
+              A[i][j]=int(M[i][j])
+        return(A,col)
+
 def read_write(A,z,name):
     if z=="r":
         with open(A,z) as fhand:
@@ -81,49 +101,45 @@ def Gauss_Jordan(a,b,col):
                 for c in range(q,r):
                     a[w][c]=a[w][c]-factor*a[q][c]
 
-    return a,b
+    return(a,b)
 
 
-#multiplication of matrice
-def mult(M,N,col_N):
-    r=len(M)
-    E=[[0 for y in range(col_N)]for x in range(r)]
+#multiplication of matrice M x N
+def mult(M,N):
+    E=[[0 for y in range(len(N[0]))]for x in range(len(M))]
     I=[[1,0,0],[0,1,0],[0,0,1]]
-    for i in range(r):
-        for j in range(col_M):
-            for k in range(r):
+    for i in range(len(M)):
+        for j in range(len(N[0])):
+            for k in range(len(N)):
                 E[i][j]+=M[i][k]*N[k][j]
-    if E==I:
-        print("result is identity matrix")
-    for r in E:
-        print(r)
+    return(E)
 
 
-    def L_Udec(A):
-        for j in range(c_A):
-            for i in range(len(A)):
+def L_Udec(A):
+    for j in range(c_A):
+        for i in range(len(A)):
 
-                #diagonal
-                if i==j:
-                    sum=0
-                    for u in range(i):
-                        sum=sum+A[i][u]*A[u][i]
-                    A[i][i]=A[i][i]-sum
+            #diagonal
+            if i==j:
+                sum=0
+                for u in range(i):
+                    sum=sum+A[i][u]*A[u][i]
+                A[i][i]=A[i][i]-sum
 
-                    #elements of upper triangle
-                if i<j:
-                    sum=0
-                    for k in range(i):
-                        sum=sum+A[i][k]*A[k][j]
-                    A[i][j]=A[i][j]-sum
+                #elements of upper triangle
+            if i<j:
+                sum=0
+                for k in range(i):
+                    sum=sum+A[i][k]*A[k][j]
+                A[i][j]=A[i][j]-sum
 
-                    #elements of lower triangle
-                if i>j:
-                    sum=0
-                    for z in range(j):
-                        sum=sum+A[i][z]*A[z][j]
-                    A[i][j]=(A[i][j]-sum)/A[j][j]
-        return(A)
+                #elements of lower triangle
+            if i>j:
+                sum=0
+                for z in range(j):
+                    sum=sum+A[i][z]*A[z][j]
+                A[i][j]=(A[i][j]-sum)/A[j][j]
+    return(A)
 
 
 def forw_backw(A,B,col):
@@ -145,9 +161,8 @@ def forw_backw(A,B,col):
                 sum=sum+A[l][m]*X[m][g]
             X[l][g]=(Y[l][g]-sum)/A[l][l]
             X[l][g]=round(X[l][g],4)
-    print("matrix Y",Y)
-    print("inverse matrix is",X)
-
+    #matrix Y and inverse matrix is X
+    return(Y,X)
 
 # bracketing of roots
 def bracketing(a,b,equation):
@@ -484,7 +499,7 @@ def RK4(x0,y_x0,v_x0,h,f,g,analy,xn):
     plt.plot(z[0],Z[0],'r',label='analyticaal solution')
     plt.plot(z[1],Z[1],'r')
     plt.xlim([-6,6])
-    plt.ylim([-10,100])
+    plt.ylim([-5,5])
     plt.legend()
     plt.show()
 
@@ -511,27 +526,7 @@ def RK4_s(x0,y0,_n,y_0,z_0,h,fun1,fun2):
         y = y + 1/6*(k1y+(2*k2y)+(2*k3y)+k4y)
         z = z + 1/6*(k1z+(2*k2z)+(2*k3z)+k4z)
     return(X,Y)
-#regula_falsi method
-# def shooting_method(x0,a,xn,b,func,funct_g,func3,h,z):
-#          M,N = Runge_Kutta4_method_2_O(x0,a,x0,z,h,func,funct_g)
-#          while (N[-1],5)>b):
-#              print('The guess a smaller slope')
-#              g_1 = float(input('Guess_1 the slope at y({}):'.format(a)))
-#              M,N1 = Runge_Kutta4_method_2_O(x0,a,x0,g_1,h,func,funct_g)
-#         if round(N1[-1] - y_b,5)!= 0:
-#              g_2 = float(input('Guess_2 the slope at y({}):'.format(a)))
-#              M,N2 = Runge_Kutta4_method_2_O(u,N,a,b,y_a,g_2)
-#              while (round(N2[-1],5)<y_b):
-#                  print('The guess a larger slope')
-#                  g_2 = float(input('Guess_2 the slope at y({}):'.format(a)))
-#                  M,N2 = Runge_Kutta4_method_2_O(u,N,a,b,y_a,g_2)
-#              #lagrange_interpolation
-#              l = g_1 + (g_2 - g_1)*(y_b-N1[-1])/(N2[-1]-N1[-1])
-#              print('Using langrange extrapolation, the slope at y({}) is {}\n'.format(a,l))
-#              M,N1 = Runge_Kutta4_method_2_O(u,N,a,b,y_a,l)
-#          return(M,N1)
-#         pass
-
+#
 # Assignmen 8 functions
 # three D plot
 def threeDplot(X,Y,Z):
@@ -631,11 +626,7 @@ def random_walk(n):
     Rs=Rs/100
     Dx=dX/100
     Dy=dY/100
-    print(n,"steps")
-    print("avg displacement in x direction",Dx)
-    print("avg displacement in y direction",Dy)
     R_av=R/100
-    print("R=",R_av)
     Rrms=m.sqrt(Rs)
-    print("Rrms",Rrms)
-    return(X,Y,Rrms)
+
+    return(X,Y,Rrms,Dx,Dy,R_av)

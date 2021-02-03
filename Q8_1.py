@@ -7,10 +7,17 @@ N=[]
 r=[250,750,1050,1550,2050]
 # plotting R vs square root of N
 for i in r:
-    X,Y,R_=li.random_walk(i)
+    X,Y,R_,Dx,Dy,R_avg=li.random_walk(i)
     R.append(R_)
     N.append(m.sqrt(i))
+    print(i,"steps")
+    print("avg displacement in x direction",Dx)
+    print("avg displacement in y direction",Dy)
+    print("R=",R_avg)
+
+    print("Rrms",R_)
 li.plotting(R,N,r'$\sqrt{N}$',r'$R_{rms}$',"Rrms vs square root(N)")
+
 # output:
 # 250 steps
 # avg displacement in x direction 0.5334461187660261
